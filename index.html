@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HolterTECH — Нательный пульсометр с записью ЭКГ</title>
+<style>
+  /* --- Reset и базовые стили --- */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #121212;
+    color: #eee;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a {
+    color: #e03030;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Контейнер --- */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 20px 15px;
+  }
+
+  /* --- Хедер --- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+  }
+  .logo {
+    height: 50px;
+  }
+  nav a {
+    color: #eee;
+    margin-left: 25px;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  nav a:hover {
+    color: #e03030;
+  }
+
+  /* --- Главный экран --- */
+  .hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 30px;
+    margin-top: 40px;
+  }
+  .hero-text {
+    flex: 1 1 320px;
+    min-width: 280px;
+  }
+  .hero-text h1 {
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 18px;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .hero-text p {
+    font-size: 1.15rem;
+    color: #ccc;
+    margin-bottom: 25px;
+  }
+  .price {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 30px;
+    color: #e03030;
+  }
+  .btn-order {
+    background-color: #e03030;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 14px 35px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+  }
+  .btn-order:hover {
+    background-color: #b52222;
+  }
+  .hero-image {
+    flex: 1 1 300px;
+    min-width: 280px;
+    text-align: center;
+  }
+  .hero-image img {
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(224,48,48,0.6);
+  }
+
+  /* --- Функции --- */
+  .features {
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 30px;
+  }
+  .feature-item {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 25px 20px;
+    box-shadow: 0 0 10px rgba(224,48,48,0.3);
+    transition: box-shadow 0.3s ease;
+  }
+  .feature-item:hover {
+    box-shadow: 0 0 18px rgba(224,48,48,0.7);
+  }
+  .feature-title {
+    font-weight: 700;
+    color: #e03030;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .feature-desc {
+    font-size: 1rem;
+    color: #ccc;
+  }
+
+  /* --- Галерея --- */
+  .gallery {
+    margin-top: 70px;
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .gallery img {
+    border-radius: 12px;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0 0 15px rgba(224,48,48,0.5);
+    transition: transform 0.3s ease;
+    cursor: default;
+  }
+  .gallery img:hover {
+    transform: scale(1.05);
+  }
+
+  /* --- История --- */
+  section#history {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid #2a2a2a;
+  }
+  section#history h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #e03030;
+    transform: translateX(-50%);
+    border-radius: 3px;
+  }
+  .timeline-item {
+    position: relative;
+    width: 45%;
+    padding: 20px 30px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    box-shadow: 0 0 10px rgba(224,48,48,0.3);
+  }
+  .timeline-item:nth-child(odd) {
+    left: 0;
+  }
+  .timeline-item:nth-child(even) {
+    left: 55%;
+  }
+  .timeline-item::after {
+    content: '';
+    position: absolute;
+    top: 25px;
+    width: 20px;
+    height: 20px;
+    background: #e03030;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #e03030;
+  }
+  .timeline-item:nth-child(odd)::after {
+    right: -10px;
+  }
+  .timeline-item:nth-child(even)::after {
+    left: -10px;
+  }
+  .timeline-date {
+    font-weight: 700;
+    color: #e03030;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+  .timeline-text {
+    color: #ccc;
+    font-size: 1rem;
+  }
+
+  /* --- Контакты --- */
+  section#contacts {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid #2a2a2a;
+  }
+  section#contacts h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .contacts-info {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    font-size: 1rem;
+    color: #ccc;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .contacts-info a {
+    color: #e03030;
+    font-weight: 700;
+  }
+
+  /* --- Анимации появления --- */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation-fill-mode: forwards;
+    animation-name: fadeInUp;
+    animation-duration: 0.8s;
+    animation-timing-function: ease-out;
+  }
+  .fade-in.delay-1 {
+    animation-delay: 0.3s;
+  }
+  .fade-in.delay-2 {
+    animation-delay: 0.6s;
+  }
+  .fade-in.delay-3 {
+    animation-delay: 0.9s;
+  }
+  .fade-in.delay-4 {
+    animation-delay: 1.2s;
+  }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* --- Адаптив --- */
+  @media (max-width: 900px) {
+    .hero {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+    .hero-text, .hero-image {
+      flex: none;
+      width: 100%;
+    }
+    nav a {
+      margin-left: 15px;
+      font-size: 14px;
+    }
+    .timeline-item {
+      width: 90% !important;
+      left: 5% !important;
+      margin-left: 0 !important;
+    }
+    .timeline-item:nth-child(even) {
+      left: 5% !important;
+    }
+    .timeline::before {
+      left: 10px;
+    }
+    .timeline-item::after {
+      left: -20px !important;
+      right: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="container fade-in">
+  <!-- Логотип: вставь свой логотип вместо src -->
+  <a href="#hero" aria-label="Перейти на главную">
+    <img src="logo.png" alt="HolterTECH логотип" class="logo" />
+  </a>
+  <nav>
+    <a href="#hero">О продукте</a>
+    <a href="#history">История</a>
+    <a href="#contacts">Контакты</a>
+    <a href="#preorder" class="btn-order" style="padding: 10px 18px; font-size: 14px; margin-left: 20px;">Предзаказ</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- Главный экран -->
+  <section id="hero" class="hero fade-in delay-1" >
+    <div class="hero-text">
+      <h1>Медицинская точность. Спортивная надёжность.<br>Полная свобода движений.</h1>
+      <p>Нательный пульсометр с технологией записи ЭКГ, созданный для спортсменов.</p>
+      <div class="price">Цена от 7000 ₽</div>
+      <a href="mailto:your-email@example.com?subject=Предзаказ%20HolterTECH" class="btn-order" aria-label="Сделать предзаказ">Предзаказ</a>
+    </div>
+    <div class="hero-image">
+      <!-- Вставь сюда рендер устройства -->
+         <img src="render-device-on-body.png" alt="Устройство HolterTECH на теле человека"/>
+    </div>
+  </section>
+
+  <!-- Главные функции -->
+  <section class="features fade-in delay-2" aria-label="Главные функции продукта">
+    <div class="feature-item">
+      <div class="feature-title">Непрерывная регистрация ЭКГ</div>
+      <div class="feature-desc">Высокая точность на уровне медицинских устройств.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-title">Отслеживание заболеваний</div>
+      <div class="feature-desc">Обнаружение аритмий и других отклонений в реальном времени.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-title">Влагозащита IP67–IP68</div>
+      <div class="feature-desc">Надёжная работа в любых условиях.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-title">Месяц работы без подзарядки</div>
+      <div class="feature-desc">Надёжное автономное использование на тренировках и соревнованиях.</div>
+    </div>
+  </section>
+
+  <!-- Галерея рендеров -->
+  <section class="gallery fade-in delay-3" aria-label="Галерея изображений устройства">
+    <img src="render_main.png" alt="Вид устройства HolterTECH спереди" />
+    <img src="render-device-colors.png" alt="Цветовые варианты HolterTECH" />
+  </section>
+
+  <!-- История стартапа -->
+  <section id="history" class="fade-in delay-4" aria-label="История создания стартапа">
+    <h2>История стартапа</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Сентябрь 2024 — Идея и концепция</div>
+        <div class="timeline-text">Формирование идеи создать нательный пульсометр с уникальной технологией крепления.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Ноябрь 2024 — первые победы</div>
+        <div class="timeline-text">Попали в топ-40 акселератора Академии Инноваторов.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Декабрь 2024 — Первый прототип</div>
+        <div class="timeline-text">Представили первый прототип на акселераторе ГУУ.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025 — Создание прототипа приложения</div>
+        <div class="timeline-text">Создали и протестировали прототип приложения и передачу данных от устройства на телефон.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Сегодня</div>
+        <div class="timeline-text">Мы продолжаем разработку и готовые открыть первые предзаказы!</div>
+      </div>
+      <div class="timeline-item" style="text-align:center; background:#e03030; color:#fff; cursor:pointer;">
+        <a href="mailto:your-email@example.com?subject=Предзаказ%20HolterTECH" style="color:#fff; font-weight:700; font-size:1.2rem; text-decoration:none;">Сделать предзаказ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контакты -->
+  <section id="contacts" class="fade-in delay-4" aria-label="Контактная информация">
+    <h2>Контакты</h2>
+    <div class="contacts-info">
+      <p>Свяжитесь с нами для вопросов и предложений.</p>
+      <p>Email: <a href="mailto:zx2orin@ya.ru">zx2orin@ya.ru</a></p>
+      <p>Телефон: <a href="tel:+7952695412">+7 (952) 695-41-32</a></p>
+      <p>Telegram: <a href="https://t.me/m2orin" target="_blank" rel="noopener">@m2orin</a></p>
+      <p><a href="mailto:your-email@example.com?subject=Предзаказ%20HolterTECH" class="btn-order" style="display:inline-block; margin-top:20px;">Предзаказ</a></p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Простая анимация появления при скролле
+  document.addEventListener('DOMContentLoaded', () => {
+    const faders = document.querySelectorAll('.fade-in');
+    const appearOptions = { threshold: 0.1 };
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+  });
+</script>
+
+</body>
+</html>
